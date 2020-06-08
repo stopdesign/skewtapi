@@ -21,7 +21,7 @@ class Radiosonde(models.Model):
     dewpointK = ArrayField(models.DecimalField(max_digits=6, decimal_places=2), default=list)
     pressurehPA = ArrayField(models.IntegerField(), default=list)
     u_windMS = ArrayField(models.DecimalField(max_digits=6, decimal_places=2), default=list)
-    v_windMS =ArrayField(models.DecimalField(max_digits=6, decimal_places=2), default=list)
+    v_windMS = ArrayField(models.DecimalField(max_digits=6, decimal_places=2), default=list)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
