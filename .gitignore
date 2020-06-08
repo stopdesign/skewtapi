@@ -1,9 +1,7 @@
 *_env
 *.pyc
 staticfiles
-.env
 .production_env
-db.sqlite3
 getting-started/*
 config/static/
 

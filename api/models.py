@@ -2,38 +2,31 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
+from django.conf import settings
 from math import cos, asin, sqrt
 import csv
 import re
 
 
 
-models.DecimalField(max_digits=7, decimal_places=3)
-models.CharField(max_length=200)
-ArrayField(models.IntegerField(), default=list, size=40)
-ArrayField(models.DecimalField(max_digits=4, decimal_places=3), default=list, size=40)
-models.DateTimeField('reference time', null=True)
-models.ForeignKey(Spot, on_delete=models.CASCADE)
-
-
 
 class Radiosonde(models.Model):
 
-    sonde_validtime = models.DateTimeField('sonde validtime', null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     wmo_id = models.CharField(max_length=50)
+    sonde_validtime = models.DateTimeField('sonde validtime', null=True)
     station_name = models.CharField(max_length=100)
     lat = models.DecimalField(max_digits=9, decimal_places=4)
     lon = models.DecimalField(max_digits=9, decimal_places=4)
-    temperatureK = ArrayField(models.DecimalField(max_digits=4, decimal_places=3), default=list)
-    dewpointK = ArrayField(models.DecimalField(max_digits=4, decimal_places=3), default=list)
+    temperatureK = ArrayField(models.DecimalField(max_digits=6, decimal_places=2), default=list)
+    dewpointK = ArrayField(models.DecimalField(max_digits=6, decimal_places=2), default=list)
     pressurehPA = ArrayField(models.IntegerField(), default=list)
-    u_windMS = ArrayField(models.DecimalField(max_digits=4, decimal_places=3), default=list)
-    v_windMS =ArrayField(models.DecimalField(max_digits=4, decimal_places=3), default=list)
+    u_windMS = ArrayField(models.DecimalField(max_digits=6, decimal_places=2), default=list)
+    v_windMS =ArrayField(models.DecimalField(max_digits=6, decimal_places=2), default=list)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{station_name} ({wmo_id}): {sonde_validtime}\ntemperature: {temperatureK}"
+        return f"{self.station_name} ({self.wmo_id}): {self.sonde_validtime}\ntemperature: {self.temperatureK}"
 
 
 
@@ -45,6 +38,7 @@ class UpdateRecord(models.Model):
     @classmethod
     def delete_expired(cls, expiration_days):
         limit = timezone.now() - timezone.timedelta(days=expiration_days)
+        # breakpoint()
         cls.objects.filter(cls.updatetime <= limit).delete()
         cls.save()
 
@@ -59,7 +53,7 @@ class Station(models.Model):
     stn_altitude = models.DecimalField(max_digits=9, decimal_places=4)
 
     def __str__(self):
-        return f"{stn_name} ({stn_wmoid})"
+        return f"{self.stn_name} ({self.stn_wmoid})"
 
     @classmethod
     def initialize_stations(cls):
@@ -68,7 +62,7 @@ class Station(models.Model):
                      "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "RI", "SC", "SD",
                      "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY"]
 
-        with open('station_list.txt', 'r') as csvfile:
+        with open(settings.BASE_DIR + '/scripts/station_list.txt', 'r') as csvfile:
             print("Running station initializer...")
             stndata = csv.reader(csvfile, delimiter='\t')
             for row in stndata:

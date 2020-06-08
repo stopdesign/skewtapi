@@ -40,8 +40,19 @@ def basic_qc(Ps, T, Td, U, V):
         if T[0]<200 or T[0]>330 or np.isnan(T).all():
             Ps = np.array([]); T = np.array([]); Td = np.array([])
             U = np.array([]); V = np.array([])
+      
+    if not isinstance(Ps, list):
+        Ps = Ps.tolist()
+    if not isinstance(T, list):
+        T = T.tolist()
+    if not isinstance(Td, list):
+        Td = Td.tolist()
+    if not isinstance(U, list):
+        U = U.tolist()
+    if not isinstance(V, list):
+        V = V.tolist()
 
-    return Ps.tolist(), np.round(T.tolist(), 2), Td.tolist(), U.tolist(), V.tolist()
+    return Ps, T, Td, U, V
 
 
 def RemNaN_and_Interp(raob):
@@ -125,6 +136,7 @@ def commit_sonde(raob):
         station = Station.objects.filter(stn_wmoid=stn).first() 
 
         if station:
+            # breakpoint()
             if radiosonde:
                 radiosonde.sonde_validtime = times[i]
                 radiosonde.temperatureK = T[i]
@@ -180,10 +192,10 @@ def read_madis():
 
     # Iterate through the files, find what's been modified since the last call and extract the new data
     for file in ftp.nlst():
-        file_timestamp = datetime.strptime(ftp.voidcmd("MDTM {}".format(file))[4:].strip(), '%Y%m%d%H%M%S')
+        file_timestamp = datetime.strptime(ftp.voidcmd("MDTM {}".format(file))[4:].strip(), '%Y%m%d%H%M%S').replace(tzinfo=pytz.utc)
         record = UpdateRecord.objects.filter(filename=file).first()
         if record:
-            if (file_timestamp != record.updatetime and (datetime.utcnow() - file_timestamp).total_seconds() < 173000):
+            if (file_timestamp != record.updatetime and (timezone.now() - file_timestamp).total_seconds() < 173000):
                 print("{} will be updated. Old mod time was {}. New mod time is {}".format(file, record.updatetime, file_timestamp))
                 extract_madis_data(ftp, file)
                 record.updatetime = file_timestamp
@@ -196,8 +208,13 @@ def read_madis():
                 print("Contents of {} recorded with timestamp {}".format(file, file_timestamp))
                 new_record.save()
 
-if __name__=='__main__':
-    UpdateRecord.delete_expired(10)
+
+
+def run():
+    # UpdateRecord.delete_expired(10)
     raob = read_madis()
+
+
+
 
 
