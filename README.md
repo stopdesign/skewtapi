@@ -1,1 +1,1 @@
-Source code for the django version of tephigrams.org
+Source code for the django version of skewt.org
