@@ -4,6 +4,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 from django.conf import settings
 from math import cos, asin, sqrt
+from decimal import Decimal as d
 import csv
 import re
 
@@ -76,9 +77,9 @@ class Station(models.Model):
                 else:
                     stn_name = stn_name.title()
                 stn_name = fields['stn_name'].strip().title()
-                stn_lat = float(fields['stn_lat'])
-                stn_lon = float(fields['stn_lon'])
-                stn_altitude = float(fields['stn_altitude'])
+                stn_lat = d(fields['stn_lat'])
+                stn_lon = d(fields['stn_lon'])
+                stn_altitude = d(fields['stn_altitude'])
 
                 if stn_altitude != -998.8:
                     station = Station(stn_wmoid=stn_wmoid, stn_lat=stn_lat, stn_lon=stn_lon, stn_name=stn_name, stn_altitude=stn_altitude)
@@ -88,10 +89,10 @@ class Station(models.Model):
 class Haversine:
     @classmethod
     def distance(cls, lat1, lon1, lat2, lon2):
-        p = 0.017453292519943295
+        p = d(0.017453292519943295)
         a = 0.5 - cos((lat2-lat1)*p)/2 + cos(lat1*p)*cos(lat2*p) * (1-cos((lon2-lon1)*p)) / 2
         return 12742 * asin(sqrt(a))
 
     @classmethod
     def closest(cls, data, v):
-        return min(data, key=lambda p: cls.distance(float(v['lat']), float(v['lon']), p.lat, p.lon))
+        return min(data, key=lambda p: cls.distance(d(v['lat']), d(v['lon']), p.lat, p.lon))
