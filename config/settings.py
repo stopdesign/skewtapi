@@ -29,13 +29,14 @@ if os.uname().nodename == 'leno':
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', 'api.skewt.org', 'www.skewt.org', 'skewt.org']
+ALLOWED_HOSTS = ['localhost', 'api.skewt.org']
 
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,14 +44,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'corsheaders',
     'webpack_loader',
     "widget_tweaks",
     'django_extensions',
-    'api'
+    'api',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -58,11 +59,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware'
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
+
 
 ROOT_URLCONF = 'config.urls'
 
@@ -140,13 +141,3 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
-# WEBPACK_LOADER = {
-#     'DEFAULT': {
-#         'CACHE': not DEBUG,
-#         'BUNDLE_DIR_NAME': 'frontend/compiled_assets/', # must end with slash
-#         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
-#         'POLL_INTERVAL': 0.1,
-#         'TIMEOUT': None,
-#         'IGNORE': ['.+\.hot-update.js', '.+\.map']
-#     }
-# }
