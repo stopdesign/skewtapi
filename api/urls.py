@@ -3,7 +3,7 @@ from api.views import RadiosondeAPIView, AvailableAPIView, NearestAPIView
 
 
 urlpatterns = [
-    re_path('available/$', AvailableAPIView.as_view(), name="available-sondes"),
+    path('available/', AvailableAPIView.as_view(), name="available-sondes"),
     re_path('sondes/$', RadiosondeAPIView.as_view(), name="get-sonde"),
     re_path('nearest/$', NearestAPIView.as_view(), name="nearest-sonde"),
 ] 
