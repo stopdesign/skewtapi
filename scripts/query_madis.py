@@ -192,12 +192,13 @@ def read_madis():
 
     # Iterate through the files, find what's been modified since the last call and extract the new data
     for file in ftp.nlst():
-        file_timestamp = datetime.strptime(ftp.voidcmd("MDTM {}".format(file))[4:].strip(), '%Y%m%d%H%M%S').replace(tzinfo=pytz.utc)
+        file_timestamp = datetime.strptime(ftp.voidcmd("MDTM {}".format(file))[4:].strip(), '%Y%m%d%H%M%S').replace(microsecond=0).replace(tzinfo=pytz.utc)
         record = UpdateRecord.objects.filter(filename=file).first()
         if record:
             if (file_timestamp != record.updatetime and (timezone.now() - file_timestamp).total_seconds() < 173000):
                 print("{} will be updated. Old mod time was {}. New mod time is {}".format(file, record.updatetime, file_timestamp))
                 extract_madis_data(ftp, file)
+                # breakpoint()
                 record.updatetime = file_timestamp
                 record.save()
         else:
